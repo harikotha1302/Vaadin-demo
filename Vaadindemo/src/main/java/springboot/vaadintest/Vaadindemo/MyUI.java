@@ -1,16 +1,25 @@
 package springboot.vaadintest.Vaadindemo;
 
+import java.util.List;
+
 import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+
+import springboot.spring.entity.EmployeeEntity;
+import springboot.spring.services.Departmentservice;
+import springboot.spring.services.Employeeservice;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -22,28 +31,37 @@ import com.vaadin.ui.VerticalLayout;
 @Theme("mytheme")
 public class MyUI extends UI {
 
-    /**
+	
+	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6773332277548107748L;
+	private static final long serialVersionUID = 1L;
 
-	@Override
+	@Autowired
+	private Departmentservice dservice;
+	
+	@Autowired
+	private Employeeservice eservice;
+	
+	@Autowired
+	private Grid<EmployeeEntity> grid=new Grid<>(EmployeeEntity.class);
+	
+	@Override 
     protected void init(VaadinRequest vaadinRequest) {
         final VerticalLayout layout = new VerticalLayout();
         
-        final TextField name = new TextField();
-        name.setCaption("Type your name here:");
-
-        Button button = new Button("Click Me");
-        button.addClickListener( e -> {
-            layout.addComponent(new Label("Thanks " + name.getValue() 
-                    + ", it works!"));
-        });
-        
-        layout.addComponents(name, button);
+     // add Grid to the layout
+        layout.addComponents(grid);
+        grid.setColumns("employeeid", "employeename");
         
         setContent(layout);
     }
+	
+	public void updateList() {
+	    // fetch list of Customers from service and assign it to Grid
+		List<EmployeeEntity> employees = eservice.getEmployee();
+        grid.setItems(employees);
+	}
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
