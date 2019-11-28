@@ -69,12 +69,11 @@ public class MyUI extends UI {
         filtering.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         
         grid.setColumns("employeeid","employeename");
-        grid.setItems(employeedata());
         layout.addComponents(filtering, grid);
         setContent(layout);
     }
 	
-	private List<EmployeeEntity> employeedata(){
+	private void employeedata(){
 		List<EmployeeEntity> ls=new ArrayList<EmployeeEntity>();
 		final String uri = "http://localhost:8087/employee";
 		ResponseEntity<List<EmployeeEntity>> employeeResponse =
@@ -82,25 +81,23 @@ public class MyUI extends UI {
 		                    HttpMethod.GET, null, new ParameterizedTypeReference<List<EmployeeEntity>>() {
 		            });
 		ls=employeeResponse.getBody();
-		return ls;
+		grid.setItems(ls);
 	}
 	
-	private List<EmployeeEntity> employeesearch(String id)
+	private void employeesearch(String id)
 	{
-		List<EmployeeEntity> ls=new ArrayList<EmployeeEntity>();
 		final String uri = "http://localhost:8087/employee/{id}";
 		Map<String,String> m=new HashMap<>();
 		m.put("id", id);
 		URI url = UriComponentsBuilder.fromUriString(uri)
-		        .buildAndExpand(m)
-		        .toUri();
+	        .buildAndExpand(m)
+	        .toUri();
 		ResponseEntity<EmployeeEntity> employeeResponse =
-		        service.exchange(url,
-		                    HttpMethod.GET, null,EmployeeEntity.class);
-		EmployeeEntity e= employeeResponse.getBody();
-		e.toString();
-		ls.add(e);
-		return ls;
+	        service.exchange(url,
+	                    HttpMethod.GET, null,EmployeeEntity.class);
+		;
+		System.out.println(employeeResponse.getBody());
+		grid.setItems(employeeResponse.getBody());
 		
 	}
 
